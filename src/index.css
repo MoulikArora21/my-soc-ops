@@ -207,6 +207,14 @@ button {
   animation-delay: 250ms;
 }
 
+.reveal-delay-4 {
+  animation-delay: 340ms;
+}
+
+.reveal-delay-5 {
+  animation-delay: 420ms;
+}
+
 .board-reveal {
   animation: boardReveal 480ms ease both;
 }
@@ -224,4 +232,61 @@ button {
     transition-duration: 1ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ── Onboarding: nickname input ───────────────────────────── */
+.onboarding-input {
+  width: 100%;
+  max-width: 22rem;
+  padding: 0.65rem 1rem;
+  border-radius: 0.75rem;
+  border: 1.5px solid rgb(255 255 255 / 0.18);
+  background: rgb(255 255 255 / 0.07);
+  color: var(--color-chalk);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.onboarding-input::placeholder {
+  color: var(--color-chalk-soft);
+}
+
+.onboarding-input:focus {
+  border-color: rgb(255 255 255 / 0.38);
+  background: rgb(255 255 255 / 0.11);
+}
+
+/* ── Onboarding: vibe chips ───────────────────────────────── */
+.vibe-chip {
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1.5px solid rgb(255 255 255 / 0.18);
+  background: rgb(255 255 255 / 0.07);
+  color: var(--color-chalk);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+.vibe-chip:hover {
+  background: rgb(255 255 255 / 0.13);
+  border-color: rgb(255 255 255 / 0.28);
+}
+
+.vibe-chip:active {
+  transform: scale(0.96);
+}
+
+.vibe-chip-active {
+  background: rgb(243 201 105 / 0.2);
+  border-color: var(--color-accent);
+  color: var(--color-accent-light);
+}
+
+.vibe-chip-active:hover {
+  background: rgb(243 201 105 / 0.28);
 }

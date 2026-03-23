@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import type { BingoSquareData, BingoLine, GameState } from '../types';
+import type { BingoSquareData, BingoLine, GameState, PlayerProfile } from '../types';
 import {
   generateBoard,
   toggleSquare,
@@ -13,23 +13,36 @@ export interface BingoGameState {
   winningLine: BingoLine | null;
   winningSquareIds: Set<number>;
   showBingoModal: boolean;
+  playerProfile: PlayerProfile;
 }
 
 export interface BingoGameActions {
-  startGame: () => void;
+  startGame: (profile: PlayerProfile) => void;
   handleSquareClick: (squareId: number) => void;
   resetGame: () => void;
   dismissModal: () => void;
 }
 
 const STORAGE_KEY = 'bingo-game-state';
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
+
+const DEFAULT_PROFILE: PlayerProfile = { nickname: '', vibe: null };
 
 interface StoredGameData {
   version: number;
   gameState: GameState;
   board: BingoSquareData[];
   winningLine: BingoLine | null;
+  playerProfile: PlayerProfile;
+}
+
+function validatePlayerProfile(profile: unknown): profile is PlayerProfile {
+  if (!profile || typeof profile !== 'object') return false;
+  const p = profile as Record<string, unknown>;
+  return (
+    typeof p.nickname === 'string' &&
+    (p.vibe === null || typeof p.vibe === 'string')
+  );
 }
 
 function validateStoredData(data: unknown): data is StoredGameData {
@@ -80,11 +93,15 @@ function validateStoredData(data: unknown): data is StoredGameData {
       return false;
     }
   }
+
+  if (!validatePlayerProfile(obj.playerProfile)) {
+    return false;
+  }
   
   return true;
 }
 
-function loadGameState(): Pick<BingoGameState, 'gameState' | 'board' | 'winningLine'> | null {
+function loadGameState(): Pick<BingoGameState, 'gameState' | 'board' | 'winningLine' | 'playerProfile'> | null {
   // SSR guard
   if (typeof window === 'undefined') {
     return null;
@@ -103,6 +120,7 @@ function loadGameState(): Pick<BingoGameState, 'gameState' | 'board' | 'winningL
         gameState: parsed.gameState,
         board: parsed.board,
         winningLine: parsed.winningLine,
+        playerProfile: parsed.playerProfile,
       };
     } else {
       console.warn('Invalid game state data in localStorage, clearing...');
@@ -118,7 +136,7 @@ function loadGameState(): Pick<BingoGameState, 'gameState' | 'board' | 'winningL
   return null;
 }
 
-function saveGameState(gameState: GameState, board: BingoSquareData[], winningLine: BingoLine | null): void {
+function saveGameState(gameState: GameState, board: BingoSquareData[], winningLine: BingoLine | null, playerProfile: PlayerProfile): void {
   // SSR guard
   if (typeof window === 'undefined') {
     return;
@@ -130,6 +148,7 @@ function saveGameState(gameState: GameState, board: BingoSquareData[], winningLi
       gameState,
       board,
       winningLine,
+      playerProfile,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (error) {
@@ -150,6 +169,9 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
     () => loadedState?.winningLine || null
   );
   const [showBingoModal, setShowBingoModal] = useState(false);
+  const [playerProfile, setPlayerProfile] = useState<PlayerProfile>(
+    () => loadedState?.playerProfile ?? DEFAULT_PROFILE
+  );
 
   const winningSquareIds = useMemo(
     () => getWinningSquareIds(winningLine),
@@ -158,10 +180,11 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
 
   // Save game state to localStorage whenever it changes
   useEffect(() => {
-    saveGameState(gameState, board, winningLine);
-  }, [gameState, board, winningLine]);
+    saveGameState(gameState, board, winningLine, playerProfile);
+  }, [gameState, board, winningLine, playerProfile]);
 
-  const startGame = useCallback(() => {
+  const startGame = useCallback((profile: PlayerProfile) => {
+    setPlayerProfile(profile);
     setBoard(generateBoard());
     setWinningLine(null);
     setGameState('playing');
@@ -191,6 +214,7 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
     setBoard([]);
     setWinningLine(null);
     setShowBingoModal(false);
+    setPlayerProfile(DEFAULT_PROFILE);
   }, []);
 
   const dismissModal = useCallback(() => {
@@ -203,6 +227,7 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
     winningLine,
     winningSquareIds,
     showBingoModal,
+    playerProfile,
     startGame,
     handleSquareClick,
     resetGame,
