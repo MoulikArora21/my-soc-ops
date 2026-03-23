@@ -364,3 +364,209 @@ button {
   accent-color: #9ce1c4;
   cursor: pointer;
 }
+
+/* ── Card Deck Shuffle ───────────────────────────────────── */
+.deck-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.deck-table {
+  display: grid;
+  grid-template-columns: minmax(88px, 120px) minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: stretch;
+}
+
+.deck-stack {
+  position: relative;
+  min-height: 180px;
+  perspective: 900px;
+}
+
+.deck-stack-card {
+  position: absolute;
+  inset: auto 0 0;
+  width: 100%;
+  height: 160px;
+  border-radius: 0.85rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgb(13 43 34 / 0.95) 0,
+      rgb(13 43 34 / 0.95) 6px,
+      rgb(28 83 66 / 0.95) 6px,
+      rgb(28 83 66 / 0.95) 12px
+    );
+  box-shadow:
+    0 0.45rem 0.9rem rgb(0 0 0 / 0.25),
+    inset 0 0 0 2px rgb(255 255 255 / 0.06);
+  transform-origin: center bottom;
+}
+
+.deck-stack-card-1 {
+  transform: translateY(18px) rotate(-8deg);
+}
+
+.deck-stack-card-2 {
+  transform: translateY(12px) rotate(-3deg);
+}
+
+.deck-stack-card-3 {
+  transform: translateY(6px) rotate(4deg);
+}
+
+.deck-stack-card-4 {
+  transform: translateY(0) rotate(9deg);
+}
+
+.deck-stack-shuffle .deck-stack-card-1 {
+  animation: deckShuffleOne 620ms ease;
+}
+
+.deck-stack-shuffle .deck-stack-card-2 {
+  animation: deckShuffleTwo 620ms ease;
+}
+
+.deck-stack-shuffle .deck-stack-card-3 {
+  animation: deckShuffleThree 620ms ease;
+}
+
+.deck-stack-shuffle .deck-stack-card-4 {
+  animation: deckShuffleFour 620ms ease;
+}
+
+.deck-card {
+  position: relative;
+  border-radius: 1rem;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  background:
+    linear-gradient(170deg, rgb(26 63 51 / 0.92), rgb(14 36 29 / 0.95));
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.06),
+    0 0.75rem 1.3rem rgb(0 0 0 / 0.22);
+  min-height: 170px;
+  padding: 1.1rem;
+  overflow: hidden;
+}
+
+.deck-card::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -40%;
+  width: 38%;
+  height: 140%;
+  background: linear-gradient(to right, transparent, rgb(255 255 255 / 0.25), transparent);
+  transform: translateX(-180%) rotate(16deg);
+}
+
+.deck-card-drawing {
+  animation: deckCardDraw 620ms ease;
+}
+
+.deck-card-drawing::after {
+  animation: cardShine 620ms ease;
+}
+
+.deck-suit {
+  font-size: 1.45rem;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgb(0 0 0 / 0.22);
+}
+
+.deck-suit-red {
+  color: #f58282;
+}
+
+.deck-suit-black {
+  color: #f2efe6;
+}
+
+@keyframes deckCardDraw {
+  0% {
+    opacity: 0.5;
+    transform: translateX(-20%) rotateY(45deg) scale(0.92);
+  }
+
+  56% {
+    opacity: 1;
+    transform: translateX(2%) rotateY(-10deg) scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotateY(0) scale(1);
+  }
+}
+
+@keyframes cardShine {
+  0% {
+    transform: translateX(-180%) rotate(16deg);
+  }
+
+  100% {
+    transform: translateX(460%) rotate(16deg);
+  }
+}
+
+@keyframes deckShuffleOne {
+  0%,
+  100% {
+    transform: translateY(18px) rotate(-8deg);
+  }
+
+  40% {
+    transform: translateY(6px) rotate(-18deg);
+  }
+}
+
+@keyframes deckShuffleTwo {
+  0%,
+  100% {
+    transform: translateY(12px) rotate(-3deg);
+  }
+
+  38% {
+    transform: translateY(-2px) rotate(8deg);
+  }
+}
+
+@keyframes deckShuffleThree {
+  0%,
+  100% {
+    transform: translateY(6px) rotate(4deg);
+  }
+
+  42% {
+    transform: translateY(-8px) rotate(-10deg);
+  }
+}
+
+@keyframes deckShuffleFour {
+  0%,
+  100% {
+    transform: translateY(0) rotate(9deg);
+  }
+
+  44% {
+    transform: translateY(-14px) rotate(15deg);
+  }
+}
+
+@media (max-width: 639px) {
+  .deck-table {
+    grid-template-columns: 1fr;
+  }
+
+  .deck-stack {
+    min-height: 100px;
+  }
+
+  .deck-stack-card {
+    width: 86px;
+    height: 124px;
+  }
+}

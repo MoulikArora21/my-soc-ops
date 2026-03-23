@@ -31,7 +31,9 @@ export function StartScreen({ onStart }: StartScreenProps) {
   let ctaLabel =
     selectedMode === "bingo"
       ? "Ring The Bell And Start Bingo"
-      : "Ring The Bell And Start Hunt";
+      : selectedMode === "scavenger"
+        ? "Ring The Bell And Start Hunt"
+        : "Ring The Bell And Shuffle Deck";
   if (name && vibeItem) {
     ctaLabel = `Ring The Bell, ${name} · ${vibeItem.emoji}`;
   } else if (name) {
@@ -111,7 +113,7 @@ export function StartScreen({ onStart }: StartScreenProps) {
             >
               Choose game mode
             </p>
-            <div className="mx-auto grid max-w-xl grid-cols-1 gap-2 sm:grid-cols-2">
+            <div className="mx-auto grid max-w-xl grid-cols-1 gap-2 sm:grid-cols-3">
               <button
                 type="button"
                 onClick={() => setSelectedMode("bingo")}
@@ -138,6 +140,19 @@ export function StartScreen({ onStart }: StartScreenProps) {
                   Check every prompt to finish.
                 </span>
               </button>
+              <button
+                type="button"
+                onClick={() => setSelectedMode("cardDeck")}
+                aria-pressed={selectedMode === "cardDeck"}
+                className={`mode-card${selectedMode === "cardDeck" ? " mode-card-active" : ""}`}
+              >
+                <span className="text-sm font-extrabold tracking-wide text-chalk">
+                  Card Deck Shuffle
+                </span>
+                <span className="mt-1 text-sm text-chalk-soft">
+                  Tap to draw a random prompt card.
+                </span>
+              </button>
             </div>
           </div>
 
@@ -150,6 +165,7 @@ export function StartScreen({ onStart }: StartScreenProps) {
               <li>Ask around and find someone that fits each square.</li>
               <li>In Bingo mode, chalk squares and land 5 in a row.</li>
               <li>In Hunt mode, check off every prompt on the list.</li>
+              <li>In Deck mode, tap to pull a random question card.</li>
             </ul>
           </div>
 

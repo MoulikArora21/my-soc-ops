@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import type {
   BingoSquareData,
   BingoLine,
+  CardDeckState,
   GameMode,
   GameState,
   PlayerProfile,
@@ -19,6 +20,7 @@ import {
   generateScavengerItems,
   toggleScavengerItem,
 } from '../utils/scavengerHuntLogic';
+import { createCardDeckState, drawCard } from '../utils/cardDeckLogic';
 
 export interface BingoGameState {
   gameState: GameState;
@@ -29,6 +31,7 @@ export interface BingoGameState {
   showBingoModal: boolean;
   scavengerItems: ScavengerItem[];
   scavengerProgress: ReturnType<typeof calculateScavengerProgress>;
+  cardDeck: CardDeckState;
   playerProfile: PlayerProfile;
 }
 
@@ -36,6 +39,7 @@ export interface BingoGameActions {
   startGame: (profile: PlayerProfile) => void;
   handleSquareClick: (squareId: number) => void;
   handleScavengerToggle: (itemId: number) => void;
+  drawDeckCard: () => void;
   resetCurrentMode: () => void;
   backToStart: () => void;
   dismissModal: () => void;
@@ -43,6 +47,14 @@ export interface BingoGameActions {
 
 const STORAGE_KEY = 'bingo-game-state';
 const STORAGE_VERSION = 3;
+const LEGACY_STORAGE_VERSION = 2;
+
+const BINGO_BOARD_SQUARES = 25;
+const SCAVENGER_ITEM_COUNT = 24;
+const CARD_DECK_QUESTION_COUNT = 24;
+
+const VALID_GAME_STATES: readonly GameState[] = ['start', 'playing', 'bingo'];
+const VALID_LINE_TYPES: readonly BingoLine['type'][] = ['row', 'column', 'diagonal'];
 
 const DEFAULT_PROFILE: PlayerProfile = { nickname: '', vibe: null, mode: 'bingo' };
 
@@ -64,6 +76,7 @@ interface StoredGameData {
   bingoBoard: BingoSquareData[];
   winningLine: BingoLine | null;
   scavengerItems: ScavengerItem[];
+  cardDeck: CardDeckState;
   playerProfile: PlayerProfile;
 }
 
@@ -73,6 +86,7 @@ interface LoadedState {
   bingoBoard: BingoSquareData[];
   winningLine: BingoLine | null;
   scavengerItems: ScavengerItem[];
+  cardDeck: CardDeckState;
   playerProfile: PlayerProfile;
 }
 
@@ -88,6 +102,29 @@ function isValidSquare(square: unknown): square is BingoSquareData {
   );
 }
 
+function isValidGameState(state: unknown): state is GameState {
+  return typeof state === 'string' && VALID_GAME_STATES.includes(state as GameState);
+}
+
+function isValidWinningLine(lineValue: unknown): lineValue is BingoLine | null {
+  if (lineValue === null) {
+    return true;
+  }
+
+  if (!lineValue || typeof lineValue !== 'object') {
+    return false;
+  }
+
+  const line = lineValue as Record<string, unknown>;
+
+  return (
+    typeof line.type === 'string' &&
+    VALID_LINE_TYPES.includes(line.type as BingoLine['type']) &&
+    typeof line.index === 'number' &&
+    Array.isArray(line.squares)
+  );
+}
+
 function isValidScavengerItem(item: unknown): item is ScavengerItem {
   if (!item || typeof item !== 'object') return false;
 
@@ -99,13 +136,26 @@ function isValidScavengerItem(item: unknown): item is ScavengerItem {
   );
 }
 
+function isValidCardDeckState(deck: unknown): deck is CardDeckState {
+  if (!deck || typeof deck !== 'object') return false;
+
+  const value = deck as Record<string, unknown>;
+
+  return (
+    (value.currentCard === null || typeof value.currentCard === 'string') &&
+    Array.isArray(value.remainingCards) &&
+    value.remainingCards.every((card) => typeof card === 'string') &&
+    typeof value.drawCount === 'number'
+  );
+}
+
 function validatePlayerProfile(profile: unknown): profile is PlayerProfile {
   if (!profile || typeof profile !== 'object') return false;
   const p = profile as Record<string, unknown>;
   return (
     typeof p.nickname === 'string' &&
     (p.vibe === null || typeof p.vibe === 'string') &&
-    (p.mode === 'bingo' || p.mode === 'scavenger')
+    (p.mode === 'bingo' || p.mode === 'scavenger' || p.mode === 'cardDeck')
   );
 }
 
@@ -116,15 +166,15 @@ function validateLegacyStoredData(data: unknown): data is LegacyStoredGameData {
 
   const obj = data as Record<string, unknown>;
 
-  if (obj.version !== 2) {
+  if (obj.version !== LEGACY_STORAGE_VERSION) {
     return false;
   }
 
-  if (typeof obj.gameState !== 'string' || !['start', 'playing', 'bingo'].includes(obj.gameState)) {
+  if (!isValidGameState(obj.gameState)) {
     return false;
   }
 
-  if (!Array.isArray(obj.board) || (obj.board.length !== 0 && obj.board.length !== 25)) {
+  if (!Array.isArray(obj.board) || (obj.board.length !== 0 && obj.board.length !== BINGO_BOARD_SQUARES)) {
     return false;
   }
 
@@ -134,19 +184,8 @@ function validateLegacyStoredData(data: unknown): data is LegacyStoredGameData {
     return false;
   }
 
-  if (obj.winningLine !== null) {
-    if (typeof obj.winningLine !== 'object') {
-      return false;
-    }
-    const line = obj.winningLine as Record<string, unknown>;
-    if (
-      typeof line.type !== 'string' ||
-      !['row', 'column', 'diagonal'].includes(line.type) ||
-      typeof line.index !== 'number' ||
-      !Array.isArray(line.squares)
-    ) {
-      return false;
-    }
+  if (!isValidWinningLine(obj.winningLine)) {
+    return false;
   }
 
   if (!obj.playerProfile || typeof obj.playerProfile !== 'object') {
@@ -172,19 +211,23 @@ function validateStoredData(data: unknown): data is StoredGameData {
     return false;
   }
 
-  if (typeof obj.gameState !== 'string' || !['start', 'playing', 'bingo'].includes(obj.gameState)) {
+  if (!isValidGameState(obj.gameState)) {
     return false;
   }
 
-  if (obj.gameMode !== 'bingo' && obj.gameMode !== 'scavenger') {
+  if (obj.gameMode !== 'bingo' && obj.gameMode !== 'scavenger' && obj.gameMode !== 'cardDeck') {
     return false;
   }
 
-  if (!Array.isArray(obj.bingoBoard) || (obj.bingoBoard.length !== 0 && obj.bingoBoard.length !== 25)) {
+  if (!Array.isArray(obj.bingoBoard) || (obj.bingoBoard.length !== 0 && obj.bingoBoard.length !== BINGO_BOARD_SQUARES)) {
     return false;
   }
 
-  if (!Array.isArray(obj.scavengerItems) || obj.scavengerItems.length !== 24) {
+  if (!Array.isArray(obj.scavengerItems) || obj.scavengerItems.length !== SCAVENGER_ITEM_COUNT) {
+    return false;
+  }
+
+  if (!isValidCardDeckState(obj.cardDeck) || obj.cardDeck.remainingCards.length > CARD_DECK_QUESTION_COUNT) {
     return false;
   }
 
@@ -192,19 +235,8 @@ function validateStoredData(data: unknown): data is StoredGameData {
     return false;
   }
 
-  if (obj.winningLine !== null) {
-    if (typeof obj.winningLine !== 'object') {
-      return false;
-    }
-    const line = obj.winningLine as Record<string, unknown>;
-    if (
-      typeof line.type !== 'string' ||
-      !['row', 'column', 'diagonal'].includes(line.type) ||
-      typeof line.index !== 'number' ||
-      !Array.isArray(line.squares)
-    ) {
-      return false;
-    }
+  if (!isValidWinningLine(obj.winningLine)) {
+    return false;
   }
 
   if (!validatePlayerProfile(obj.playerProfile)) {
@@ -221,6 +253,7 @@ function migrateLegacyData(data: LegacyStoredGameData): LoadedState {
     bingoBoard: data.board,
     winningLine: data.winningLine,
     scavengerItems: generateScavengerItems(),
+    cardDeck: createCardDeckState(),
     playerProfile: {
       nickname: data.playerProfile.nickname,
       vibe: data.playerProfile.vibe,
@@ -250,6 +283,7 @@ function loadGameState(): LoadedState | null {
         bingoBoard: parsed.bingoBoard,
         winningLine: parsed.winningLine,
         scavengerItems: parsed.scavengerItems,
+        cardDeck: parsed.cardDeck,
         playerProfile: parsed.playerProfile,
       };
     }
@@ -286,6 +320,7 @@ function saveGameState(state: LoadedState): void {
       bingoBoard: state.bingoBoard,
       winningLine: state.winningLine,
       scavengerItems: state.scavengerItems,
+      cardDeck: state.cardDeck,
       playerProfile: state.playerProfile,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -312,6 +347,9 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
   const [scavengerItems, setScavengerItems] = useState<ScavengerItem[]>(
     () => loadedState?.scavengerItems || generateScavengerItems()
   );
+  const [cardDeck, setCardDeck] = useState<CardDeckState>(
+    () => loadedState?.cardDeck || createCardDeckState()
+  );
   const [showBingoModal, setShowBingoModal] = useState(false);
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile>(
     () => loadedState?.playerProfile ?? DEFAULT_PROFILE
@@ -335,9 +373,10 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
       bingoBoard: board,
       winningLine,
       scavengerItems,
+      cardDeck,
       playerProfile,
     });
-  }, [gameState, gameMode, board, winningLine, scavengerItems, playerProfile]);
+  }, [gameState, gameMode, board, winningLine, scavengerItems, cardDeck, playerProfile]);
 
   const startGame = useCallback((profile: PlayerProfile) => {
     const normalizedProfile: PlayerProfile = {
@@ -350,10 +389,18 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
     setGameMode(normalizedProfile.mode);
 
     if (normalizedProfile.mode === 'bingo') {
-      setBoard((currentBoard) => (currentBoard.length === 25 ? currentBoard : generateBoard()));
-    } else {
+      setBoard((currentBoard) =>
+        currentBoard.length === BINGO_BOARD_SQUARES ? currentBoard : generateBoard()
+      );
+    } else if (normalizedProfile.mode === 'scavenger') {
       setScavengerItems((currentItems) =>
-        currentItems.length === 24 ? currentItems : generateScavengerItems()
+        currentItems.length === SCAVENGER_ITEM_COUNT ? currentItems : generateScavengerItems()
+      );
+    } else {
+      setCardDeck((currentDeck) =>
+        currentDeck.remainingCards.length <= CARD_DECK_QUESTION_COUNT
+          ? currentDeck
+          : createCardDeckState()
       );
     }
 
@@ -391,11 +438,25 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
     setScavengerItems((currentItems) => toggleScavengerItem(currentItems, itemId));
   }, [gameMode]);
 
+  const drawDeckCard = useCallback(() => {
+    if (gameMode !== 'cardDeck') {
+      return;
+    }
+
+    setCardDeck((currentDeck) => drawCard(currentDeck));
+  }, [gameMode]);
+
   const resetCurrentMode = useCallback(() => {
     if (gameMode === 'bingo') {
       setBoard(generateBoard());
       setWinningLine(null);
       setShowBingoModal(false);
+      setGameState('playing');
+      return;
+    }
+
+    if (gameMode === 'cardDeck') {
+      setCardDeck(createCardDeckState());
       setGameState('playing');
       return;
     }
@@ -406,6 +467,7 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
 
   const backToStart = useCallback(() => {
     setGameState('start');
+    setWinningLine(null);
     setShowBingoModal(false);
   }, []);
 
@@ -422,10 +484,12 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
     showBingoModal,
     scavengerItems,
     scavengerProgress,
+    cardDeck,
     playerProfile,
     startGame,
     handleSquareClick,
     handleScavengerToggle,
+    drawDeckCard,
     resetCurrentMode,
     backToStart,
     dismissModal,

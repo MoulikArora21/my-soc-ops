@@ -13,7 +13,7 @@ export interface BingoLine {
   squares: number[];
 }
 
-export type GameMode = 'bingo' | 'scavenger';
+export type GameMode = 'bingo' | 'scavenger' | 'cardDeck';
 
 export type GameState = 'start' | 'playing' | 'bingo';
 
@@ -28,6 +28,12 @@ export interface ScavengerProgress {
   totalCount: number;
   percent: number;
   isComplete: boolean;
+}
+
+export interface CardDeckState {
+  currentCard: string | null;
+  remainingCards: string[];
+  drawCount: number;
 }
 
 /** Onboarding personalisation collected on the StartScreen. */

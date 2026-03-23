@@ -10,11 +10,13 @@ function App() {
     board,
     scavengerItems,
     scavengerProgress,
+    cardDeck,
     winningSquareIds,
     showBingoModal,
     startGame,
     handleSquareClick,
     handleScavengerToggle,
+    drawDeckCard,
     resetCurrentMode,
     backToStart,
     dismissModal,
@@ -31,10 +33,12 @@ function App() {
         board={board}
         scavengerItems={scavengerItems}
         scavengerProgress={scavengerProgress}
+        cardDeck={cardDeck}
         winningSquareIds={winningSquareIds}
         hasBingo={gameMode === "bingo" && gameState === "bingo"}
         onSquareClick={handleSquareClick}
         onScavengerToggle={handleScavengerToggle}
+        onDrawDeckCard={drawDeckCard}
         onResetMode={resetCurrentMode}
         onBackToStart={backToStart}
       />

@@ -1,10 +1,12 @@
 import type {
   BingoSquareData,
+  CardDeckState,
   GameMode,
   ScavengerItem,
   ScavengerProgress,
 } from "../types";
 import { BingoBoard } from "./BingoBoard";
+import { CardDeckShuffle } from "./CardDeckShuffle";
 import { ScavengerHuntList } from "./ScavengerHuntList";
 
 interface GameScreenProps {
@@ -12,10 +14,12 @@ interface GameScreenProps {
   board: BingoSquareData[];
   scavengerItems: ScavengerItem[];
   scavengerProgress: ScavengerProgress;
+  cardDeck: CardDeckState;
   winningSquareIds: Set<number>;
   hasBingo: boolean;
   onSquareClick: (squareId: number) => void;
   onScavengerToggle: (itemId: number) => void;
+  onDrawDeckCard: () => void;
   onResetMode: () => void;
   onBackToStart: () => void;
 }
@@ -25,14 +29,35 @@ export function GameScreen({
   board,
   scavengerItems,
   scavengerProgress,
+  cardDeck,
   winningSquareIds,
   hasBingo,
   onSquareClick,
   onScavengerToggle,
+  onDrawDeckCard,
   onResetMode,
   onBackToStart,
 }: GameScreenProps) {
-  const isBingo = gameMode === "bingo";
+  const modeTitle =
+    gameMode === "bingo"
+      ? "Classroom Bingo"
+      : gameMode === "scavenger"
+        ? "Scavenger Hunt"
+        : "Card Deck Shuffle";
+
+  const modeDescription =
+    gameMode === "bingo"
+      ? "Circle matches as you meet people. Any full row, column, or diagonal wins."
+      : gameMode === "scavenger"
+        ? "Use the same prompts as a checklist. Check every line to finish the hunt."
+        : "Every tap draws a random card with a question for your player.";
+
+  const modeTagline =
+    gameMode === "bingo"
+      ? "Keep moving, keep mingling."
+      : gameMode === "scavenger"
+        ? "Check it off, then chase the next clue."
+        : "Tap, reveal, ask, repeat.";
 
   return (
     <div className="page-shell">
@@ -45,7 +70,7 @@ export function GameScreen({
             Back To Hallway
           </button>
           <h1 className="chalk-heading text-lg text-chalk sm:text-2xl">
-            {isBingo ? "Classroom Bingo" : "Scavenger Hunt"}
+            {modeTitle}
           </h1>
           <button
             onClick={onResetMode}
@@ -58,36 +83,34 @@ export function GameScreen({
         <div className="px-4 pb-6 pt-5 sm:px-8 sm:pb-8">
           <div className="reveal reveal-delay-1 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/12 bg-white/8 px-4 py-3">
             <p className="chalk-subtext text-sm sm:text-base">
-              {isBingo
-                ? "Circle matches as you meet people. Any full row, column, or diagonal wins."
-                : "Use the same prompts as a checklist. Check every line to finish the hunt."}
+              {modeDescription}
             </p>
             <span className="chalk-hand text-2xl text-accent sm:text-3xl">
-              {isBingo
-                ? "Keep moving, keep mingling."
-                : "Check it off, then chase the next clue."}
+              {modeTagline}
             </span>
           </div>
 
-          {isBingo && hasBingo && (
+          {gameMode === "bingo" && hasBingo && (
             <div className="chalk-pop reveal mt-4 rounded-xl border border-bingo/45 bg-bingo/18 px-4 py-3 text-center text-sm font-bold uppercase tracking-wider text-bingo sm:text-base">
               Bingo unlocked! Your line lit up in chalk.
             </div>
           )}
 
           <div className="mt-5 sm:mt-6">
-            {isBingo ? (
+            {gameMode === "bingo" ? (
               <BingoBoard
                 board={board}
                 winningSquareIds={winningSquareIds}
                 onSquareClick={onSquareClick}
               />
-            ) : (
+            ) : gameMode === "scavenger" ? (
               <ScavengerHuntList
                 items={scavengerItems}
                 progress={scavengerProgress}
                 onToggle={onScavengerToggle}
               />
+            ) : (
+              <CardDeckShuffle deck={cardDeck} onDrawCard={onDrawDeckCard} />
             )}
           </div>
         </div>
