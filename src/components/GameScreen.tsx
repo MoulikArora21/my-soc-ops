@@ -17,39 +17,42 @@ export function GameScreen({
   onReset,
 }: GameScreenProps) {
   return (
-    <div className="flex flex-col min-h-full bg-gray-50">
-      {/* Header */}
-      <header className="flex items-center justify-between p-3 bg-white border-b border-gray-200">
-        <button
-          onClick={onReset}
-          className="text-gray-500 text-sm px-3 py-1.5 rounded active:bg-gray-100"
-        >
-          ← Back
-        </button>
-        <h1 className="font-bold text-gray-900">Soc Ops</h1>
-        <div className="w-16"></div>
-      </header>
+    <div className="page-shell">
+      <section className="chalkboard-panel w-full max-w-5xl overflow-hidden board-reveal">
+        <header className="wood-rail reveal flex items-center justify-between px-3 py-2 sm:px-5 sm:py-3">
+          <button
+            onClick={onReset}
+            className="rounded-lg border border-black/25 bg-black/15 px-3 py-1.5 text-sm font-bold tracking-wide text-chalk transition-colors hover:bg-black/25"
+          >
+            Back To Hallway
+          </button>
+          <h1 className="chalk-heading text-lg text-chalk sm:text-2xl">Classroom Bingo</h1>
+          <span className="chalk-chip px-3 py-1 text-xs font-bold tracking-wide sm:text-sm">5 x 5 Board</span>
+        </header>
 
-      {/* Instructions */}
-      <p className="text-center text-gray-500 text-sm py-2 px-4">
-        Tap a square when you find someone who matches it.
-      </p>
+        <div className="px-4 pb-6 pt-5 sm:px-8 sm:pb-8">
+          <div className="reveal reveal-delay-1 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/12 bg-white/8 px-4 py-3">
+            <p className="chalk-subtext text-sm sm:text-base">
+              Circle matches as you meet people. Any full row, column, or diagonal wins.
+            </p>
+            <span className="chalk-hand text-2xl text-accent sm:text-3xl">Keep moving, keep mingling.</span>
+          </div>
 
-      {/* Bingo indicator */}
-      {hasBingo && (
-        <div className="bg-amber-100 text-amber-800 text-center py-2 font-semibold text-sm">
-          🎉 BINGO! You got a line!
+          {hasBingo && (
+            <div className="chalk-pop reveal mt-4 rounded-xl border border-bingo/45 bg-bingo/18 px-4 py-3 text-center text-sm font-bold uppercase tracking-wider text-bingo sm:text-base">
+              Bingo unlocked! Your line lit up in chalk.
+            </div>
+          )}
+
+          <div className="mt-5 sm:mt-6">
+            <BingoBoard
+              board={board}
+              winningSquareIds={winningSquareIds}
+              onSquareClick={onSquareClick}
+            />
+          </div>
         </div>
-      )}
-
-      {/* Board */}
-      <div className="flex-1 flex items-center justify-center p-3">
-        <BingoBoard
-          board={board}
-          winningSquareIds={winningSquareIds}
-          onSquareClick={onSquareClick}
-        />
-      </div>
+      </section>
     </div>
   );
 }

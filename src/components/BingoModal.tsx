@@ -4,15 +4,15 @@ interface BingoModalProps {
 
 export function BingoModal({ onDismiss }: BingoModalProps) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl p-6 max-w-xs w-full text-center shadow-xl animate-[bounce_0.5s_ease-out]">
-        <div className="text-5xl mb-4">🎉</div>
-        <h2 className="text-3xl font-bold text-amber-500 mb-2">BINGO!</h2>
-        <p className="text-gray-600 mb-6">You completed a line!</p>
-        
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/62 p-4 backdrop-blur-[2px]">
+      <div className="chalk-pop w-full max-w-sm rounded-2xl border-2 border-white/22 bg-board/95 px-6 py-7 text-center shadow-2xl">
+        <p className="chalk-hand text-4xl text-accent">Classroom Cheers</p>
+        <h2 className="chalk-heading mt-2 text-4xl text-bingo">BINGO</h2>
+        <p className="chalk-subtext mt-3 text-base">You filled a full line before the bell. Keep mingling for bonus lines.</p>
+
         <button
           onClick={onDismiss}
-          className="w-full bg-accent text-white font-semibold py-3 px-6 rounded-lg active:bg-accent-light transition-colors"
+          className="chalk-button mt-6 w-full rounded-xl px-6 py-3 text-lg font-extrabold"
         >
           Keep Playing
         </button>

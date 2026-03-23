@@ -4,27 +4,34 @@ interface StartScreenProps {
 
 export function StartScreen({ onStart }: StartScreenProps) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-full p-6 bg-gray-50">
-      <div className="text-center max-w-sm">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Soc Ops</h1>
-        <p className="text-lg text-gray-600 mb-8">Social Bingo</p>
-        
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 mb-8">
-          <h2 className="font-semibold text-gray-800 mb-3">How to play</h2>
-          <ul className="text-left text-gray-600 text-sm space-y-2">
-            <li>• Find people who match the questions</li>
-            <li>• Tap a square when you find a match</li>
-            <li>• Get 5 in a row to win!</li>
-          </ul>
-        </div>
+    <div className="page-shell">
+      <section className="chalkboard-panel px-5 py-7 sm:px-8 sm:py-10 board-reveal">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="chalk-hand reveal text-2xl text-accent sm:text-3xl">Homeroom Mixer</p>
+          <h1 className="chalk-heading reveal reveal-delay-1 mt-3 text-5xl text-chalk sm:text-6xl">
+            Soc Ops
+          </h1>
+          <p className="chalk-subtext reveal reveal-delay-2 mx-auto mt-4 max-w-xl text-base sm:text-lg">
+            Roll call is open. Find classmates who match each clue and mark your board in chalk.
+          </p>
 
-        <button
-          onClick={onStart}
-          className="w-full bg-accent text-white font-semibold py-4 px-8 rounded-lg text-lg active:bg-accent-light transition-colors"
-        >
-          Start Game
-        </button>
-      </div>
+          <div className="reveal reveal-delay-3 mt-8 rounded-2xl border border-white/15 bg-white/7 p-5 text-left shadow-lg sm:p-6">
+            <h2 className="chalk-heading text-xl text-chalk sm:text-2xl">Class Rules</h2>
+            <ul className="mt-4 space-y-3 text-sm leading-6 text-chalk-soft sm:text-base">
+              <li>Ask around and find someone that fits each square.</li>
+              <li>Tap each match to chalk it on your board.</li>
+              <li>Land 5 in a row to call out BINGO.</li>
+            </ul>
+          </div>
+
+          <button
+            onClick={onStart}
+            className="chalk-button reveal reveal-delay-3 mt-8 w-full rounded-xl px-8 py-4 text-lg font-extrabold sm:mt-10 sm:text-xl"
+          >
+            Ring The Bell And Start
+          </button>
+        </div>
+      </section>
     </div>
   );
 }
