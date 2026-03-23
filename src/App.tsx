@@ -6,12 +6,17 @@ import { BingoModal } from './components/BingoModal';
 function App() {
   const {
     gameState,
+    gameMode,
     board,
+    scavengerItems,
+    scavengerProgress,
     winningSquareIds,
     showBingoModal,
     startGame,
     handleSquareClick,
-    resetGame,
+    handleScavengerToggle,
+    resetCurrentMode,
+    backToStart,
     dismissModal,
   } = useBingoGame();
 
@@ -22,13 +27,18 @@ function App() {
   return (
     <>
       <GameScreen
+        gameMode={gameMode}
         board={board}
+        scavengerItems={scavengerItems}
+        scavengerProgress={scavengerProgress}
         winningSquareIds={winningSquareIds}
-        hasBingo={gameState === 'bingo'}
+        hasBingo={gameMode === 'bingo' && gameState === 'bingo'}
         onSquareClick={handleSquareClick}
-        onReset={resetGame}
+        onScavengerToggle={handleScavengerToggle}
+        onResetMode={resetCurrentMode}
+        onBackToStart={backToStart}
       />
-      {showBingoModal && (
+      {gameMode === 'bingo' && showBingoModal && (
         <BingoModal onDismiss={dismissModal} />
       )}
     </>

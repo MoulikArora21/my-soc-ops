@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { PlayerProfile } from '../types';
+import type { GameMode, PlayerProfile } from '../types';
 
 interface StartScreenProps {
   onStart: (profile: PlayerProfile) => void;
@@ -15,15 +15,18 @@ const VIBES: { id: string; emoji: string; label: string }[] = [
 export function StartScreen({ onStart }: StartScreenProps) {
   const [nickname, setNickname] = useState('');
   const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
+  const [selectedMode, setSelectedMode] = useState<GameMode>('bingo');
 
   function handleStart() {
-    onStart({ nickname: nickname.trim(), vibe: selectedVibe });
+    onStart({ nickname: nickname.trim(), vibe: selectedVibe, mode: selectedMode });
   }
 
   // Build personalised CTA label
   const name = nickname.trim();
   const vibeItem = VIBES.find((v) => v.id === selectedVibe);
-  let ctaLabel = 'Ring The Bell And Start';
+  let ctaLabel = selectedMode === 'bingo'
+    ? 'Ring The Bell And Start Bingo'
+    : 'Ring The Bell And Start Hunt';
   if (name && vibeItem) {
     ctaLabel = `Ring The Bell, ${name} · ${vibeItem.emoji}`;
   } else if (name) {
@@ -82,13 +85,41 @@ export function StartScreen({ onStart }: StartScreenProps) {
             </div>
           </div>
 
+          <div
+            className="reveal reveal-delay-4 mt-5"
+            role="group"
+            aria-labelledby="mode-label"
+          >
+            <p id="mode-label" className="chalk-hand mb-3 text-base text-chalk-soft">Choose game mode</p>
+            <div className="mx-auto grid max-w-xl grid-cols-1 gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setSelectedMode('bingo')}
+                aria-pressed={selectedMode === 'bingo'}
+                className={`mode-card${selectedMode === 'bingo' ? ' mode-card-active' : ''}`}
+              >
+                <span className="text-sm font-extrabold tracking-wide text-chalk">Classroom Bingo</span>
+                <span className="mt-1 text-sm text-chalk-soft">5 in a row wins.</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedMode('scavenger')}
+                aria-pressed={selectedMode === 'scavenger'}
+                className={`mode-card${selectedMode === 'scavenger' ? ' mode-card-active' : ''}`}
+              >
+                <span className="text-sm font-extrabold tracking-wide text-chalk">Scavenger Hunt</span>
+                <span className="mt-1 text-sm text-chalk-soft">Check every prompt to finish.</span>
+              </button>
+            </div>
+          </div>
+
           {/* Class Rules */}
-          <div className="reveal reveal-delay-4 mt-6 rounded-2xl border border-white/15 bg-white/7 p-5 text-left shadow-lg sm:p-6">
+          <div className="reveal reveal-delay-5 mt-6 rounded-2xl border border-white/15 bg-white/7 p-5 text-left shadow-lg sm:p-6">
             <h2 className="chalk-heading text-xl text-chalk sm:text-2xl">Class Rules</h2>
             <ul className="mt-4 space-y-3 text-sm leading-6 text-chalk-soft sm:text-base">
               <li>Ask around and find someone that fits each square.</li>
-              <li>Tap each match to chalk it on your board.</li>
-              <li>Land 5 in a row to call out BINGO.</li>
+              <li>In Bingo mode, chalk squares and land 5 in a row.</li>
+              <li>In Hunt mode, check off every prompt on the list.</li>
             </ul>
           </div>
 
