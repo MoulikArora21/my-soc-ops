@@ -1,7 +1,7 @@
-import { useBingoGame } from './hooks/useBingoGame';
-import { StartScreen } from './components/StartScreen';
-import { GameScreen } from './components/GameScreen';
-import { BingoModal } from './components/BingoModal';
+import { useBingoGame } from "./hooks/useBingoGame";
+import { StartScreen } from "./components/StartScreen";
+import { GameScreen } from "./components/GameScreen";
+import { BingoModal } from "./components/BingoModal";
 
 function App() {
   const {
@@ -20,7 +20,7 @@ function App() {
     dismissModal,
   } = useBingoGame();
 
-  if (gameState === 'start') {
+  if (gameState === "start") {
     return <StartScreen onStart={startGame} />;
   }
 
@@ -32,13 +32,13 @@ function App() {
         scavengerItems={scavengerItems}
         scavengerProgress={scavengerProgress}
         winningSquareIds={winningSquareIds}
-        hasBingo={gameMode === 'bingo' && gameState === 'bingo'}
+        hasBingo={gameMode === "bingo" && gameState === "bingo"}
         onSquareClick={handleSquareClick}
         onScavengerToggle={handleScavengerToggle}
         onResetMode={resetCurrentMode}
         onBackToStart={backToStart}
       />
-      {gameMode === 'bingo' && showBingoModal && (
+      {gameMode === "bingo" && showBingoModal && (
         <BingoModal onDismiss={dismissModal} />
       )}
     </>

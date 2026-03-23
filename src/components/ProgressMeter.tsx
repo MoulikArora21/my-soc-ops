@@ -4,11 +4,20 @@ interface ProgressMeterProps {
   percent: number;
 }
 
-export function ProgressMeter({ completedCount, totalCount, percent }: ProgressMeterProps) {
+export function ProgressMeter({
+  completedCount,
+  totalCount,
+  percent,
+}: ProgressMeterProps) {
   return (
-    <section className="progress-shell reveal reveal-delay-1" aria-label="Scavenger progress">
+    <section
+      className="progress-shell reveal reveal-delay-1"
+      aria-label="Scavenger progress"
+    >
       <div className="flex items-center justify-between gap-3">
-        <p className="chalk-hand text-2xl text-accent sm:text-3xl">Scavenger Hunt Progress</p>
+        <p className="chalk-hand text-2xl text-accent sm:text-3xl">
+          Scavenger Hunt Progress
+        </p>
         <span className="chalk-chip px-3 py-1 text-xs font-bold tracking-wide sm:text-sm">
           {completedCount}/{totalCount}
         </span>

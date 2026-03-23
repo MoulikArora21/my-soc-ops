@@ -1,6 +1,11 @@
-import type { BingoSquareData, GameMode, ScavengerItem, ScavengerProgress } from '../types';
-import { BingoBoard } from './BingoBoard';
-import { ScavengerHuntList } from './ScavengerHuntList';
+import type {
+  BingoSquareData,
+  GameMode,
+  ScavengerItem,
+  ScavengerProgress,
+} from "../types";
+import { BingoBoard } from "./BingoBoard";
+import { ScavengerHuntList } from "./ScavengerHuntList";
 
 interface GameScreenProps {
   gameMode: GameMode;
@@ -27,7 +32,7 @@ export function GameScreen({
   onResetMode,
   onBackToStart,
 }: GameScreenProps) {
-  const isBingo = gameMode === 'bingo';
+  const isBingo = gameMode === "bingo";
 
   return (
     <div className="page-shell">
@@ -40,7 +45,7 @@ export function GameScreen({
             Back To Hallway
           </button>
           <h1 className="chalk-heading text-lg text-chalk sm:text-2xl">
-            {isBingo ? 'Classroom Bingo' : 'Scavenger Hunt'}
+            {isBingo ? "Classroom Bingo" : "Scavenger Hunt"}
           </h1>
           <button
             onClick={onResetMode}
@@ -54,11 +59,13 @@ export function GameScreen({
           <div className="reveal reveal-delay-1 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/12 bg-white/8 px-4 py-3">
             <p className="chalk-subtext text-sm sm:text-base">
               {isBingo
-                ? 'Circle matches as you meet people. Any full row, column, or diagonal wins.'
-                : 'Use the same prompts as a checklist. Check every line to finish the hunt.'}
+                ? "Circle matches as you meet people. Any full row, column, or diagonal wins."
+                : "Use the same prompts as a checklist. Check every line to finish the hunt."}
             </p>
             <span className="chalk-hand text-2xl text-accent sm:text-3xl">
-              {isBingo ? 'Keep moving, keep mingling.' : 'Check it off, then chase the next clue.'}
+              {isBingo
+                ? "Keep moving, keep mingling."
+                : "Check it off, then chase the next clue."}
             </span>
           </div>
 

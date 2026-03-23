@@ -1,5 +1,5 @@
-import type { ScavengerItem, ScavengerProgress } from '../types';
-import { ProgressMeter } from './ProgressMeter';
+import type { ScavengerItem, ScavengerProgress } from "../types";
+import { ProgressMeter } from "./ProgressMeter";
 
 interface ScavengerHuntListProps {
   items: ScavengerItem[];
@@ -7,7 +7,11 @@ interface ScavengerHuntListProps {
   onToggle: (itemId: number) => void;
 }
 
-export function ScavengerHuntList({ items, progress, onToggle }: ScavengerHuntListProps) {
+export function ScavengerHuntList({
+  items,
+  progress,
+  onToggle,
+}: ScavengerHuntListProps) {
   return (
     <div className="space-y-4">
       <ProgressMeter
@@ -22,9 +26,15 @@ export function ScavengerHuntList({ items, progress, onToggle }: ScavengerHuntLi
         </div>
       )}
 
-      <ul className="scavenger-list reveal reveal-delay-2" aria-label="Scavenger checklist">
+      <ul
+        className="scavenger-list reveal reveal-delay-2"
+        aria-label="Scavenger checklist"
+      >
         {items.map((item) => (
-          <li key={item.id} className={`scavenger-row${item.isChecked ? ' scavenger-row-checked' : ''}`}>
+          <li
+            key={item.id}
+            className={`scavenger-row${item.isChecked ? " scavenger-row-checked" : ""}`}
+          >
             <label className="flex cursor-pointer items-start gap-3">
               <input
                 type="checkbox"
