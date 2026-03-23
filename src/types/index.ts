@@ -14,3 +14,11 @@ export interface BingoLine {
 }
 
 export type GameState = 'start' | 'playing' | 'bingo';
+
+/** Onboarding personalisation collected on the StartScreen. */
+export interface PlayerProfile {
+  /** Optional display name the player typed; empty string means not set. */
+  nickname: string;
+  /** Id of the selected vibe chip, or null if none was chosen. */
+  vibe: string | null;
+}
