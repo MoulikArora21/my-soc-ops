@@ -225,3 +225,121 @@ button {
     scroll-behavior: auto !important;
   }
 }
+
+/* ── StartScreen landing page ─────────────────────────────── */
+
+.start-page {
+  min-height: 100%;
+  width: 100%;
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 7vw, 5rem) clamp(1.25rem, 5vw, 2.5rem) clamp(2rem, 6vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 8vw, 4.5rem);
+}
+
+.start-hero {
+  text-align: center;
+}
+
+.start-pretitle {
+  font-size: clamp(1.3rem, 3.5vw, 1.75rem);
+  color: var(--color-accent);
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.start-title {
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+}
+
+.start-title-soc {
+  font-size: clamp(4rem, 13vw, 7.5rem);
+  color: var(--color-chalk);
+  letter-spacing: 0.04em;
+}
+
+.start-title-bingo {
+  font-size: clamp(3rem, 10vw, 6rem);
+  color: var(--color-accent);
+}
+
+.start-tagline {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  line-height: 1.75;
+  max-width: 38rem;
+  margin: 1.5rem auto 0;
+}
+
+.start-rules {
+  width: 100%;
+}
+
+.start-rules-rail {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+@media (max-width: 560px) {
+  .start-rules-rail {
+    grid-template-columns: 1fr;
+  }
+}
+
+.start-rule-card {
+  border-radius: 1rem;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  background: rgb(255 255 255 / 0.06);
+  padding: clamp(1.1rem, 3vw, 1.5rem);
+}
+
+.start-rule-num {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  color: var(--color-accent);
+  opacity: 0.6;
+  display: block;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+
+.start-rule-title {
+  font-size: 1.05rem;
+  color: var(--color-chalk);
+  margin: 0 0 0.4rem;
+}
+
+.start-rule-desc {
+  font-size: 0.875rem;
+  color: var(--color-chalk-soft);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.start-cta {
+  width: 100%;
+  text-align: center;
+  margin-top: auto;
+  padding-bottom: 1rem;
+}
+
+.start-cta-btn {
+  width: 100%;
+  max-width: 26rem;
+  border-radius: 1rem;
+  padding: clamp(1rem, 3vw, 1.25rem) 2.5rem;
+  font-size: clamp(1.1rem, 3vw, 1.35rem);
+  font-weight: 800;
+}
+
+.start-cta-note {
+  margin: 0.85rem auto 0;
+  font-size: 0.875rem;
+  opacity: 0.5;
+}
